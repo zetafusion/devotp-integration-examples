@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     // Initialize the verification SDK
-    window.devInit('01JSDXTE94AKXHHVDVCPZDSJAX');
+    window.devInit('01JSDXTE94AKXHHVDVCPZDSJAX'); // Replace with your actual site ID
     
     // Set up event listener for verification results
     const handleVerification = (event) => {
