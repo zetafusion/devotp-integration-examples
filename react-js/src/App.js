@@ -44,10 +44,9 @@ function App() {
         <input 
           type="email" 
           id="email" 
-          data-verify="email" 
+          data-devotp="email" 
           placeholder="Enter your email"
         />
-        <button data-verify="verify-button">Verify Email</button>
       </div>
 
       <div className="form-group">
@@ -55,10 +54,9 @@ function App() {
         <input 
           type="tel" 
           id="phone" 
-          data-verify="phone" 
+          data-devotp="phone" 
           placeholder="Enter your phone number"
         />
-        <button data-verify="verify-button">Verify Phone</button>
       </div>
 
       {status.message && (
