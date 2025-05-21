@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEVOTP - Verification System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>OTP Verification Form</h1>
+        
+        <form id="otp-form" action="/api/submit-form" method="post">
+            <div class="form-group">
+                <input 
+                    type="email" 
+                    id="email-input" 
+                    name="email"
+                    data-devotp="email" 
+                    placeholder="Enter your email"
+                >
+                <!-- Hidden field for email signature -->
+                <input 
+                    type="hidden" 
+                    id="email-signature" 
+                    name="email_signature"
+                    value=""
+                >
+            </div>
+
+            <div class="form-group">
+                <input 
+                    type="tel" 
+                    id="phone-input"
+                    name="phone" 
+                    data-devotp="phone" 
+                    placeholder="Enter your phone number"
+                >
+                <!-- Hidden field for phone signature -->
+                <input 
+                    type="hidden" 
+                    id="phone-signature" 
+                    name="phone_signature"
+                    value=""
+                >
+            </div>
+
+            <div class="form-group">
+                <button id="submit-btn" type="submit">Submit</button>
+            </div>
+        </form>
+
+        <!-- Status display -->
+        <div id="status" class="status-container"></div>
+        
+        <!-- Result display - will show server response -->
+        <div id="result" class="result-container hidden"></div>
+    </div>
+
+    <!-- Load the SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/user-verification@0.1.8/dist/user-verification.cjs.production.min.js"></script>
+    <!-- Load our client script -->
+    <script src="/js/client.js"></script>
+</body>
+</html>
