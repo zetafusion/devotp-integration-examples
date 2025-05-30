@@ -1,0 +1,192 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.input-container {
+    position: relative;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.input-container:focus-within {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.flag-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 0 8px;
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    font-size: 20px;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.flag-container:empty {
+    min-width: 0;
+    padding: 0;
+    border-right: none;
+    background: transparent;
+}
+
+input[type="tel"] {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+    min-height: 24px;
+}
+
+input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+    margin: 10px 0;
+}
+
+input[type="email"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.form-group {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.country-info {
+    margin: 8px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.validation-info {
+    margin: 20px 0;
+    padding: 15px;
+    background: #e3f2fd;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.validation-info ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.validation-info li {
+    margin: 5px 0;
+}
+
+/* Status Messages */
+#status {
+    margin: 20px 0;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+}
+
+.status-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Border color states for validation */
+.input-container.valid {
+    border-color: #4CAF50;
+}
+
+.input-container.invalid {
+    border-color: #f44336;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        margin: 20px auto;
+        padding: 15px;
+    }
+    
+    input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .flag-container {
+        min-width: 35px;
+        font-size: 18px;
+        height: 44px;
+    }
+    
+    .validation-info {
+        font-size: 13px;
+        padding: 12px;
+    }
+}
+
+/* Animation for country detection */
+.flag-container span {
+    animation: flagAppear 0.3s ease-in-out;
+    font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'EmojiOne Color', sans-serif;
+    line-height: 1;
+}
+
+@keyframes flagAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Additional modern styling */
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    text-align: center;
+}
+
+.validation-info strong {
+    color: #1976d2;
+}
