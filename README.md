@@ -1,70 +1,211 @@
 # DEVOTP SDK
 
-This repository contains example implementations of the user verification SDK for both React.js and vanilla JavaScript applications.
+This repository contains example implementations of the DEVOTP user verification SDK for vanilla JavaScript applications with Node.js backend integration.
 
 ## Overview
 
-The User Verification SDK provides a simple way to implement email and phone verification in your web applications. The SDK handles the verification process, including sending verification codes (OTP) and validating user inputs.
+The DEVOTP SDK provides a simple way to implement email and phone verification in your web applications. The SDK handles the verification process, including sending verification codes (OTP) and validating user inputs with cryptographic signatures for enhanced security.
 
 ## Installation
 
-Install the SDK via npm:
+### Frontend SDK
 
-bash
-npm install user-verification
+For vanilla JavaScript applications, include the SDK directly from CDN:
 
+```html
+<script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+```
 
-For vanilla JavaScript applications, you can include the SDK directly from CDN:
+### Backend Dependencies
 
-html
-<script src="https://cdn.jsdelivr.net/npm/user-verification@0.1.6/dist/user-verification.cjs.production.min.js"></script>
+Install the signature decryptor for server-side validation:
 
+```bash
+npm install user-verification-signature-decryptor express
+```
 
 ## Usage
 
-### Initialization
+### Frontend Implementation
 
-Both implementations require initializing the SDK with your site ID:
+#### Vanilla JavaScript
 
-javascript
-devInit('YOUR_SITE_ID'); // Replace with your actual site ID
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Verification</title>
+</head>
+<body>
+    <div id="email-verification"></div>
+    <div id="phone-verification"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+    <script>
+        let emailData = null;
+        let phoneData = null;
 
+        // Initialize email verification
+        window.UserVerification.initEmailVerification("#email-verification", {
+            siteId: "YOUR_SITE_ID",
+            onSuccess: (data) => {
+                console.log("Email verification successful:", data);
+                emailData = data; // Store verification data
+            },
+            onError: (error) => {
+                console.error("Email verification error:", error);
+            }
+        });
 
-### HTML Markup
+        // Initialize phone verification
+        window.UserVerification.initPhoneVerification("#phone-verification", {
+            siteId: "YOUR_SITE_ID",
+            onSuccess: (data) => {
+                console.log("Phone verification successful:", data);
+                phoneData = data; // Store verification data
+            },
+            onError: (error) => {
+                console.error("Phone verification error:", error);
+            }
+        });
+    </script>
+</body>
+</html>
+```
 
-To use the SDK, add the following data attributes to your form elements:
+#### Alternative API Structure
 
-- `data-verify="email"` - For email input fields
-- `data-verify="phone"` - For phone number input fields
-- `data-verify="verify-button"` - For verification buttons
+Some versions of the SDK may use the `Devotp` namespace:
 
-### Event Handling
+```javascript
+window.Devotp.initEmailVerification("#email-verification", {
+    siteId: "YOUR_SITE_ID",
+    onSuccess: (data) => {
+        console.log("Email verification successful:", data);
+    },
+    onError: (error) => {
+        console.error("Email verification error:", error);
+    }
+});
+```
 
-The SDK dispatches a `dev-otp-verified` event when verification is complete. The event contains details about the verification status.
+### Backend Implementation
 
-## Examples
+#### Node.js with Express
 
-### React Implementation
+```javascript
+const express = require("express");
+const { PayloadDecryptor } = require("user-verification-signature-decryptor");
 
-The repository includes a complete React implementation in `App.js`. Key features:
+const app = express();
+app.use(express.json());
 
-- React hooks for state management
-- Event listener setup and cleanup
-- Status message display
+const CLIENT_DECRYPTION_KEY = "your_client_decryption_key_here";
 
-### Vanilla JavaScript Implementation
+app.post("/api/submit-form", async (req, res) => {
+    const { email, phone, email_signature, phone_signature } = req.body;
+    
+    try {
+        const decryptor = new PayloadDecryptor(CLIENT_DECRYPTION_KEY);
+        
+        let emailValidation = null;
+        let phoneValidation = null;
+        
+        // Validate email if provided
+        if (email && email_signature) {
+            const result = decryptor.validateDecryption(email, email_signature);
+            emailValidation = typeof result.then === "function" ? await result : result;
+        }
+        
+        // Validate phone if provided
+        if (phone && phone_signature) {
+            const result = decryptor.validateDecryption(phone, phone_signature);
+            phoneValidation = typeof result.then === "function" ? await result : result;
+        }
+        
+        res.json({
+            success: true,
+            verifications: {
+                email: emailValidation?.isValid || false,
+                phone: phoneValidation?.isValid || false
+            },
+            data: {
+                email: emailValidation?.isValid ? email : null,
+                phone: phoneValidation?.isValid ? phone : null
+            }
+        });
+        
+    } catch (error) {
+        console.error("Validation error:", error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 
-A standalone HTML file demonstrates the vanilla JavaScript implementation. Key features:
+app.listen(3000, () => {
+    console.log("Server running on http://localhost:3000");
+});
+```
 
-- Simple HTML structure with data attributes
-- Minimal JavaScript code for initialization and event handling
-- Basic styling for the verification interface
+## Configuration
 
-## Security Considerations
+### Required Parameters
 
-- The site ID should be treated as a public key and can be included in frontend code
-- Verification signatures should be validated on your backend for secure operations
-- Never store sensitive verification information in localStorage or sessionStorage
+- **siteId**: Your unique site identifier provided by DEVOTP
+- **clientDecryptionKey**: Server-side key for signature validation
+
+### Callback Functions
+
+- **onSuccess(data)**: Called when verification is successful
+  - `data.identifier`: The verified email or phone number
+  - `data.signature`: Cryptographic signature for server validation
+- **onError(error)**: Called when verification fails
+
+## Verification Data Structure
+
+When verification is successful, the SDK returns an object with:
+
+```javascript
+{
+    identifier: "user@example.com", // or phone number
+    signature: "encrypted_signature_string"
+}
+```
+
+## Security Features
+
+- **Cryptographic Signatures**: Each verification includes a signature that must be validated server-side
+- **Server-Side Validation**: Use the `PayloadDecryptor` to verify signatures before trusting verification data
+- **Secure Communication**: All verification data is encrypted and signed
+
+## Security Best Practices
+
+1. **Always validate signatures server-side** before processing verification data
+2. **Keep your client decryption key secure** and never expose it in frontend code
+3. **Use HTTPS** for all communication between client and server
+4. **Implement rate limiting** on your verification endpoints
+5. **Never store verification signatures** in browser storage
+
+## Error Handling
+
+Common error scenarios:
+- Invalid site ID
+- Network connectivity issues
+- Invalid phone number format
+- Email delivery failures
+- Signature validation failures
+
+Handle errors gracefully in your `onError` callback:
+
+```javascript
+onError: (error) => {
+    console.error("Verification failed:", error);
+    // Display user-friendly error message
+    showUserMessage("Verification failed. Please try again.");
+}
+```
 
 ## Browser Compatibility
 
@@ -76,7 +217,39 @@ The SDK is compatible with all modern browsers:
 
 ## Troubleshooting
 
-Common issues:
-- Verification emails not receiving: Check spam folders
-- SDK not initializing: Ensure the correct site ID is used
-- Events not firing: Verify correct data attributes are applied to elements
+**Verification emails not received:**
+- Check spam/junk folders
+- Verify email address format
+- Check rate limits
+
+**Phone verification issues:**
+- Ensure phone number includes country code
+- Check SMS delivery in your region
+- Verify phone number format
+
+**Signature validation fails:**
+- Ensure correct client decryption key is used
+- Check that verification data hasn't been modified
+- Verify server-side decryptor implementation
+
+**SDK not initializing:**
+- Verify correct site ID
+- Check browser console for errors
+- Ensure SDK script loaded properly
+
+## Example Project Structure
+
+```
+user-verification-app/
+├── index.html              # Frontend with verification widgets
+├── server.js               # Node.js backend with validation
+├── package.json            # Dependencies
+└── README.md              # This file
+```
+
+## Support
+
+For technical support and questions:
+- Check browser console for error messages
+- Verify all required parameters are provided
+- Ensure proper error handling is implemented
