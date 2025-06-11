@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="email-verification"></div>
+    <div id="phone-verification"></div>
+    <!-- <script src="../dist/devotp-sdk.bundle.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+    <script>
+      window.Devotp.initEmailVerification("#email-verification", {
+        siteId: "01JSDXTE94AKXHHVDVCPZDSJAX",
+        onSuccess: (data) => {
+          console.log("[CLIENT PROVIDED] Email verification successful:", data);
+        },
+        onError: (error) => {
+          console.error("Email verification error:", error);
+        },
+      });
+      window.Devotp.initPhoneVerification("#phone-verification", {
+        siteId: "01JSDXTE94AKXHHVDVCPZDSJAX",
+        onSuccess: (data) => {
+          console.log("[CLIENT PROVIDED] Phone verification successful:", data);
+        },
+        onError: (error) => {
+          console.error("Phone verification error:", error);
+        },
+      });
+    </script>
+  </body>
+</html>

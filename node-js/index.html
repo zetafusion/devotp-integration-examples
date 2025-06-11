@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Verification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .verification-container {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        min-height: 80px;
+      }
+      .status {
+        margin: 15px 0;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>User Verification Form</h1>
+
+    <form id="verificationForm">
+      <div class="form-group">
+        <label>Email Verification:</label>
+        <div id="email-verification" class="verification-container"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Verification:</label>
+        <div id="phone-verification" class="verification-container"></div>
+      </div>
+
+      <button type="submit" id="submit-btn">Submit</button>
+    </form>
+
+    <div id="status"></div>
+    <div id="result"></div>
+
+    <!-- <script src="../dist/devotp-sdk.bundle.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+    <script>
+      let emailData = null;
+      let phoneData = null;
+
+      console.log("Loading devotp-sdk version 1.0.1...");
+      console.log("UserVerification object:", window.UserVerification);
+
+      // Initialize email verification
+      console.log("Initializing email verification...");
+      window.UserVerification.initEmailVerification("#email-verification", {
+        siteId: "01JSDXTE94AKXHHVDVCPZDSJAX",
+        onSuccess: (data) => {
+          console.log(
+            "[CLIENT PROVIDED] ✅ Email verification successful:",
+            data
+          );
+          emailData = data;
+          showStatus("Email verified successfully!", "success");
+          console.log("[CLIENT PROVIDED] Email data stored:", emailData);
+        },
+        onError: (error) => {
+          console.error("[CLIENT PROVIDED] Email verification error:", error);
+          showStatus(
+            "Email verification failed: " + JSON.stringify(error),
+            "error"
+          );
+        },
+      });
+
+      // Initialize phone verification
+      console.log("Initializing phone verification...");
+      window.UserVerification.initPhoneVerification("#phone-verification", {
+        siteId: "01JSDXTE94AKXHHVDVCPZDSJAX",
+        onSuccess: (data) => {
+          console.log(
+            "[CLIENT PROVIDED] ✅ Phone verification successful:",
+            data
+          );
+          phoneData = data;
+          showStatus("Phone verified successfully!", "success");
+          console.log("[CLIENT PROVIDED] Phone data stored:", phoneData);
+        },
+        onError: (error) => {
+          console.error("❌ Phone verification error:", error);
+          showStatus(
+            "Phone verification failed: " + JSON.stringify(error),
+            "error"
+          );
+        },
+      });
+
+      console.log("✅ Both verification widgets initialized");
+
+      // Handle form submission
+      document
+        .getElementById("verificationForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          console.log("=== FORM SUBMISSION DEBUG ===");
+          console.log("Current emailData:", emailData);
+          console.log("Current phoneData:", phoneData);
+
+          // Check if at least one verification is completed
+          if (!emailData && !phoneData) {
+            showStatus(
+              "Please complete at least one verification (email or phone)",
+              "error"
+            );
+            return;
+          }
+
+          const formData = {
+            email: emailData ? emailData.identifier : null,
+            phone: phoneData ? phoneData.identifier : null,
+            email_signature: emailData ? emailData.signature : null,
+            phone_signature: phoneData ? phoneData.signature : null,
+          };
+
+          console.log("Form Data being sent:", formData);
+          console.log("=============================");
+
+          // Disable submit button
+          const submitBtn = document.getElementById("submit-btn");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting...";
+
+          try {
+            const response = await fetch("/api/submit-form", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+            console.log("Server response:", result);
+
+            if (result.success) {
+              showStatus("✅ Form submitted successfully!", "success");
+              displayResult(result);
+            } else {
+              showStatus(`❌ Error: ${result.message}`, "error");
+            }
+          } catch (error) {
+            console.error("❌ Network error:", error);
+            showStatus(`❌ Network error: ${error.message}`, "error");
+          } finally {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit";
+          }
+        });
+
+      function showStatus(message, type) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.className = `status ${type}`;
+        statusDiv.textContent = message;
+
+        // Auto-clear success messages after 5 seconds
+        if (type === "success") {
+          setTimeout(() => {
+            statusDiv.textContent = "";
+            statusDiv.className = "";
+          }, 5000);
+        }
+      }
+
+      function displayResult(result) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = `
+                <div class="status success">
+                    <h3>Verification Results:</h3>
+                    <p><strong>Email verified:</strong> ${
+                      result.verifications?.email ? "✅ Yes" : "❌ No"
+                    }</p>
+                    <p><strong>Phone verified:</strong> ${
+                      result.verifications?.phone ? "✅ Yes" : "❌ No"
+                    }</p>
+                    ${
+                      result.data
+                        ? `<p><strong>Submission ID:</strong> ${result.data.id}</p>`
+                        : ""
+                    }
+                </div>
+            `;
+      }
+
+      // Debug function to check current state
+      window.checkVerificationState = function () {
+        console.log("=== CURRENT VERIFICATION STATE ===");
+        console.log("emailData:", emailData);
+        console.log("phoneData:", phoneData);
+        console.log("=================================");
+      };
+
+      console.log(
+        "✅ All scripts loaded. You can call checkVerificationState() in console to debug."
+      );
+    </script>
+  </body>
+</html>
