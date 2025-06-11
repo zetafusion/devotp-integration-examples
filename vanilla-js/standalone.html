@@ -11,18 +11,18 @@
     <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
     <script>
       window.Devotp.initEmailVerification("#email-verification", {
-        siteId: "01JSDXTE94AKXHHVDVCPZDSJAX",
+        siteId: " YOUR_SITE_ID_HERE",
         onSuccess: (data) => {
-          console.log("[CLIENT PROVIDED] Email verification successful:", data);
+          console.log("Email verification successful:", data);
         },
         onError: (error) => {
           console.error("Email verification error:", error);
         },
       });
       window.Devotp.initPhoneVerification("#phone-verification", {
-        siteId: "01JSDXTE94AKXHHVDVCPZDSJAX",
+        siteId: "YOUR_SITE_ID_HERE",
         onSuccess: (data) => {
-          console.log("[CLIENT PROVIDED] Phone verification successful:", data);
+          console.log("Phone verification successful:", data);
         },
         onError: (error) => {
           console.error("Phone verification error:", error);
