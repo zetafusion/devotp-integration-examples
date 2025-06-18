@@ -8,10 +8,10 @@
   <body>
     <div id="email-verification"></div>
     <div id="phone-verification"></div>
-    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.5/dist/devotp-sdk.bundle.js"></script>
     <script>
       window.Devotp.initEmailVerification("#email-verification", {
-        siteId: " YOUR_SITE_ID_HERE",
+        siteId: "01JXKV1W1557AS91MT5ARBT7FP", //cancelled_subscription_site
         onSuccess: (data) => {
           console.log("Email verification successful:", data);
         },
@@ -20,7 +20,7 @@
         },
       });
       window.Devotp.initPhoneVerification("#phone-verification", {
-        siteId: "YOUR_SITE_ID_HERE",
+        siteId: "01JXKV1W1557AS91MT5ARBT7FP",
         onSuccess: (data) => {
           console.log("Phone verification successful:", data);
         },

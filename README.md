@@ -13,7 +13,7 @@ The DEVOTP SDK provides a simple way to implement email and phone verification i
 For vanilla JavaScript applications, include the SDK directly from CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.5/dist/devotp-sdk.bundle.js"></script>
 ```
 
 ### Backend Dependencies
@@ -40,7 +40,7 @@ npm install user-verification-signature-decryptor express
     <div id="email-verification"></div>
     <div id="phone-verification"></div>
     
-    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.4/dist/devotp-sdk.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/devotp-sdk@1.0.5/dist/devotp-sdk.bundle.js"></script>
     <script>
         let emailData = null;
         let phoneData = null;
